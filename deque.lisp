@@ -1,0 +1,110 @@
+(defpackage shi-deque
+  (:use cl)
+  (:export deque-length new-deque pop-back pop-front push-back push-front tests))
+
+(in-package shi-deque)
+
+(defstruct (item (:conc-name))
+  (prev nil)
+  (next nil)
+  (value (error "Missing :value")))
+
+(defun new-item (value &optional prev next)
+  (let ((it (make-item :value value :prev prev :next next)))
+    (unless prev (setf (prev it) it))
+    (unless next (setf (next it) it))
+    it))
+
+(defmethod print-object ((it item) out)
+  (print-object (value it) out))
+
+(defun item-append (head it)
+  (let ((next (next head)))
+    (setf (next head) it
+	  (prev next) it
+	  (prev it) head
+	  (next it) next)
+    it))
+
+(defun item-remove (it)
+  (let ((prev (prev it))
+	(next (next it)))
+    (setf (next prev) (next it))
+    (setf (prev next) (prev it)))
+  (value it))
+
+(defstruct (deque)
+  (head (error "Missing :head"))
+  (length 0))
+
+(defun new-deque (&rest in)
+  (let* ((head (new-item nil))
+	 (q (make-deque :head head)))
+    (dolist (it in)
+      (push-back q it))
+    q))
+
+(defun push-front (q value)
+  (with-slots (head length) q
+    (incf length)
+    (append head (new-item value))))
+
+(defun pop-front (q)
+  (with-slots (head length) q
+    (unless (zerop length)
+      (decf length)
+      (item-remove (next head)))))
+
+(defun push-back (q value)
+  (with-slots (head length) q  
+    (incf length)
+    (item-append (prev head) (new-item value))))
+
+(defun pop-back (q)
+  (with-slots (head length) q
+    (unless (zerop length)
+      (decf length)
+      (item-remove (prev head)))))
+
+(defun deque-items (q)
+  (let ((result nil))
+    (do-deque (v q)
+      (push v result))
+    (nreverse result)))
+
+(defmethod print-object ((q deque) out)
+  (write-char #\< out)
+  (let ((i 0))
+    (do-deque (v q)
+      (unless (zerop i)
+	(write-char #\space out))
+      (print-object v out)
+      (incf i)))
+  (write-char #\> out))
+
+(defmacro do-deque ((var q) &body body)
+  (let (($head (gensym))
+	($prev (gensym))
+	($next (gensym)))
+    `(let* ((,$head (deque-head ,q))
+	    (,$prev ,$head)
+	    (,var nil))
+       (tagbody
+	rec
+	  (let ((,$next (next ,$prev)))
+	    (unless (eq ,$next ,$head)
+	      (setf ,var (value ,$next)
+		    ,$prev ,$next)
+	      ,@body
+	      (go rec)))))))
+
+(defun tests ()
+  (let ((q (new-deque 1 2)))
+    (assert (= (deque-length q) 2))
+    (push-back q 3)
+    (assert (= (deque-length q) 3))
+    (assert (= (pop-back q) 3))
+    (dotimes (i 2)
+      (assert (= (pop-front q) (1+ i))))
+    (assert (zerop (deque-length q)))
+    (assert (null (pop-back q)))))
