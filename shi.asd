@@ -7,7 +7,7 @@
   :licence "MPL"
   :depends-on ()
   :serial t
-  :components ((:file "deque")
-	       (:file "sloc")
-	       (:file "shi")
-	       (:file "vm")))
+  :components ((:file "src/deque")
+	       (:file "src/sloc")
+	       (:file "src/shi")
+	       (:file "src/vm")))
