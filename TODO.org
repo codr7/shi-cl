@@ -1,0 +1,2 @@
+* add deque struct slot types
+* add sloc step
