@@ -1,2 +1,1 @@
-* add deque struct slot types
 * vm

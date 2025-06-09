@@ -5,8 +5,8 @@
 (in-package shi-deque)
 
 (defstruct (item (:conc-name))
-  (prev nil)
-  (next nil)
+  (prev nil :type (or null item))
+  (next nil :type (or null item))
   (value (error "Missing :value")))
 
 (defun new-item (value &optional prev next)
@@ -34,8 +34,8 @@
   (value it))
 
 (defstruct (deque)
-  (head (error "Missing :head"))
-  (length 0))
+  (head (error "Missing :head") :type item)
+  (length 0 :type integer))
 
 (defun new-deque (&rest in)
   (let* ((head (new-item nil))
