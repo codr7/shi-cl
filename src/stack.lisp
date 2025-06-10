@@ -3,6 +3,8 @@
 (deftype stack ()
   `(array cell))
 
+(declaim (ftype (function () stack) new-stack))
+
 (defun new-stack ()
   (make-array 0 :element-type 'cell
 		:adjustable t

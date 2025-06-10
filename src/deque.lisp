@@ -9,6 +9,8 @@
   (next nil :type (or null item))
   (value (error "Missing :value")))
 
+(declaim (ftype (function (t &optional item item) item) new-item))
+
 (defun new-item (value &optional prev next)
   (let ((it (make-item :value value :prev prev :next next)))
     (unless prev (setf (prev it) it))
@@ -18,6 +20,8 @@
 (defmethod print-object ((it item) out)
   (print-object (value it) out))
 
+(declaim (ftype (function (item item) item) item-append))
+
 (defun item-append (head it)
   (let ((next (next head)))
     (setf (next head) it
@@ -25,6 +29,8 @@
 	  (prev it) head
 	  (next it) next)
     it))
+
+(declaim (ftype (function (item) t) item-remove))
 
 (defun item-remove (it)
   (let ((prev (prev it))
@@ -37,6 +43,8 @@
   (head (error "Missing :head") :type item)
   (length 0 :type integer))
 
+(declaim (ftype (function (&rest t) deque) new-deque))
+
 (defun new-deque (&rest in)
   (let* ((head (new-item nil))
 	 (q (make-deque :head head)))
@@ -44,7 +52,7 @@
       (push-back q it))
     q))
 
-;(declaim (ftype (function (deque t) t) push-front))
+(declaim (ftype (function (deque t) t) push-front))
 
 (defun push-front (q value)
   (with-slots (head length) q
