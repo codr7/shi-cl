@@ -44,27 +44,53 @@
       (push-back q it))
     q))
 
+;(declaim (ftype (function (deque t) t) push-front))
+
 (defun push-front (q value)
   (with-slots (head length) q
     (incf length)
-    (append head (new-item value))))
+    (item-append head (new-item value))
+    value))
+
+(declaim (ftype (function (deque) t) peek-front))
+
+(defun peek-front (q)
+  (with-slots (head length) q
+    (unless (zerop length)
+      (value (next head)))))
+
+(declaim (ftype (function (deque) t) pop-front))
 
 (defun pop-front (q)
   (with-slots (head length) q
-    (unless (zerop length)
-      (decf length)
-      (item-remove (next head)))))
+    (when (zerop length)
+      (error "Deque is empty"))
+    (decf length)
+    (item-remove (next head))))
+
+(declaim (ftype (function (deque t) t) push-back))
 
 (defun push-back (q value)
   (with-slots (head length) q  
     (incf length)
-    (item-append (prev head) (new-item value))))
+    (item-append (prev head) (new-item value))
+    value))
+
+(declaim (ftype (function (deque) t) peek-back))
+
+(defun peek-back (q)
+  (with-slots (head length) q
+    (unless (zerop length)
+      (value (prev head)))))
+
+(declaim (ftype (function (deque) t) pop-back))
 
 (defun pop-back (q)
   (with-slots (head length) q
-    (unless (zerop length)
-      (decf length)
-      (item-remove (prev head)))))
+    (when (zerop length)
+      (error "Deque is empty"))
+    (decf length)
+    (item-remove (prev head))))
 
 (defun deque-items (q)
   (let ((result nil))
@@ -106,5 +132,5 @@
     (assert (= (pop-back q) 3))
     (dotimes (i 2)
       (assert (= (pop-front q) (1+ i))))
-    (assert (zerop (deque-length q)))
-    (assert (null (pop-back q)))))
+    (assert (zerop (deque-length q)))))
+
