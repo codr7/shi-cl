@@ -8,4 +8,5 @@
    (registers :initform (make-array 0 :element-type '(or null cell)
 				      :initial-element nil
 				      :adjustable t
-				      :fill-pointer 0))))
+				      :fill-pointer 0)
+	      :accessor registers)))

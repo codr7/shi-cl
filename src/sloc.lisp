@@ -1,6 +1,4 @@
-(defpackage shi-sloc
-  (:use cl)
-  (:export column dup line new-sloc sloc-step source))
+(in-package shi)
 
 (defstruct (sloc (:conc-name))
 	   (source (error "Missing :source"))
