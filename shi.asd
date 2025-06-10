@@ -10,4 +10,6 @@
   :components ((:file "src/deque")
 	       (:file "src/sloc")
 	       (:file "src/shi")
+	       (:file "src/cell")
+	       (:file "src/operation")
 	       (:file "src/vm")))
