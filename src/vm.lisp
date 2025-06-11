@@ -3,6 +3,9 @@
 (deftype registers-type ()
   `(array cell))
 
+(defclass label ()
+  ((pc :accessor pc)))
+
 (defstruct (call)
   (parent (error "Missing :parent") :type (or null call))
   (argument-registers (error "Missing :argument-registers") :type registers-type)

@@ -1,4 +1,8 @@
-* add remaining ops
-** benchmark, branch, call, check
+* check types in o-call
+** add cell-isa?
+* add repl
+** add readers
+*** add forms
 * fib
+* add benchmark op
 * convert to return total closure from evaluate
