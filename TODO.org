@@ -1,1 +1,4 @@
 * add remaining ops
+** benchmark, branch, call, check
+* fib
+* convert to return total closure from evaluate
