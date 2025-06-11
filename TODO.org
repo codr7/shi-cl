@@ -1,5 +1,3 @@
-* check types in o-call
-** add cell-isa?
 * add repl
 ** add readers
 *** add forms

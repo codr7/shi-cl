@@ -1,19 +1,35 @@
 (in-package shi)
 
 (defclass cell-type ()
-  ((name :initform (error "Missing :name") :initarg :name :accessor name)))
+  ((name :initform (error "Missing :name") :initarg :name :accessor name)
+   (parents :initform (error "Missing :parents")
+	    :initarg :parents
+	    :accessor parents)))
 
-(defun new-cell-type (name)
-  (make-instance 'cell-type :name name))
+(defun new-cell-type (name &rest parents)
+  (make-instance 'cell-type :name name
+			    :parents (mapcan (lambda (p) (cons p (parents p)))
+					     parents)))
 
-(defmethod cell-type= ((type cell-type) x y)
+(defmethod cell-type= ((ct cell-type) x y)
   (eq x y))
 
-(defmethod cell-type-true? ((type cell-type) c)
+(defun cell-type-parent? (pt st)
+  (with-slots (parents) st
+    (member pt parents)))
+
+(defmethod cell-type-true? ((ct cell-type) c)
   t)
 
-(defmethod cell-type-clone ((type cell-type) c)
+(defmethod cell-type-clone ((ct cell-type) c)
   c)
+
+(defmethod cell-type-dump ((ct cell-type) c out)
+  (print-object (cell-value c) out))
+
+(defmethod print-object ((ct cell-type) out)
+  (with-slots (name) ct
+    (format out name)))
 
 (defstruct (cell)
   (type (error "Missing :type") :type cell-type)
@@ -23,11 +39,25 @@
   (make-cell :type type :value value))
 
 (defun cell= (x y)
-  (and (eq (cell-type x) (cell-type y))
-       (cell-type= (cell-type x) x y)))
+  (with-slots (type) x
+      (and (eq type (cell-type y))
+	   (cell-type= type x y))))
+
+(defun cell-isa? (c pt)
+  (with-slots (type) c
+    (cell-type-parent? pt type)))
 
 (defun cell-true? (c)
-  (cell-type-true? (cell-type c) c))
+  (with-slots (type) c
+    (cell-type-true? type c)))
 
 (defun cell-clone (c)
-  (cell-type-clone (cell-type c) c))
+  (with-slots (type) c
+    (cell-type-clone type c)))
+
+(defun cell-dump (c out)
+  (with-slots (type) c
+    (cell-type-dump type c out)))
+
+(defmethod print-object ((c cell) out)
+  (cell-dump c out))

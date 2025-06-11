@@ -29,13 +29,16 @@
 
 (declaim (ftype (function (stack) integer) stack-length))
 
+(defun stack-get (stack index)
+  (aref stack index))
+
 (defun stack-length (stack)
   (length stack))
 
 (defun stack-tests ()
   (let* ((s (new-stack))
-	 (c1 (new-cell shi-core:int-type 1))
-	 (c2 (new-cell shi-core:int-type 2)))
+	 (c1 (new-cell shi-core:t-int 1))
+	 (c2 (new-cell shi-core:t-int 2)))
     (push-cell s c1)
     (push-cell s c2)
     (assert (= 2 (stack-length s)))

@@ -1,7 +1,7 @@
 (defpackage shi
   (:use cl)
   (:import-from sb-ext save-lisp-and-die)
-  (:export new-cell-type tests version))
+  (:export cell-isa? cell-type-parent? new-cell-type parents tests version))
 
 (in-package shi)
 

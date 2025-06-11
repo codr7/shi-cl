@@ -7,6 +7,7 @@
 
 (defmethod o-compile ((vm vm) (op o-branch) (pc integer))
   (lambda (stack registers)
+    (declare (ignore registers))
     (with-slots (end) op
       (if (cell-true? (pop-cell stack))
 	  (+ pc 1)
@@ -19,6 +20,20 @@
 (defmethod o-compile ((vm vm) (op o-call) (pc integer))
   (lambda (stack registers)
     (with-slots (sloc target) op
+      (let* ((sl (stack-length stack))
+	     (as (arguments target))
+	     (al (length as))
+	     (i (- sl al 1)))
+	(when (< i 0)
+	  (error "Error in ~a: Not enough arguments" sloc))
+
+	(dolist (a as)
+	  (let ((v (stack-get stack i))
+		(at (rest a)))
+	    (unless (cell-isa? v at)
+	      (error "Type mismatch in ~a: expected ~a, actual ~a"
+		     sloc at v)))))
+	
       (call target sloc vm (+ pc 1) stack registers))))
 
 (defclass o-check (operation)
@@ -27,6 +42,7 @@
 
 (defmethod o-compile ((vm vm) (op o-check) (pc integer))
   (lambda (stack registers)
+    (declare (ignore registers))
     (with-slots (expected sloc) op
       (let ((actual (pop-cell stack)))
 	(unless (cell= expected actual)
