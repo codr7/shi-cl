@@ -1,8 +1,5 @@
 (in-package shi)
 
-(defmethod operation ()
-  ())
-
 (defgeneric o-compile (vm op pc))
 
 (defclass o-goto (operation)
