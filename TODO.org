@@ -1,9 +1,3 @@
-* finish evaluate
-** adjust/compile code
-** adjust registers
-
-* implement cell-type-true? for t-int
-
 * add repl
 ** add readers
 *** add forms

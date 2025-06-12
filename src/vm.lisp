@@ -16,6 +16,8 @@
 (defclass operation ()
   ())
 
+(defgeneric compile-operation (op vm pc))
+
 (defclass vm ()
   ((call-stack :initform nil :accessor call-stack)
    (code :initform (make-array 0 :element-type 'function
@@ -26,23 +28,39 @@
 				       :adjustable t
 				       :fill-pointer 0)
 	       :accessor operations)
+   (register-count :initform 0 :accessor register-count)
    (registers :initform (make-array 0 :element-type '(or null cell)
 				      :initial-element nil
 				      :adjustable t
 				      :fill-pointer 0)
 	      :accessor registers)))
 
+(defun new-vm ()
+  (make-instance 'vm))
+
 (defmacro emit (vm op &rest args)
   `(with-slots (operations) ,vm
-     (vector-push-extend operations (make-instance ',op ,@args))))
+     (vector-push-extend (make-instance ',op ,@args) operations)))
 
 (defun evaluate (vm start-pc stop-pc stack)
-  (with-slots (code operations registers) vm
+  (with-slots (code operations register-count registers) vm
+    (when (= stop-pc -1)
+      (setf stop-pc (length operations)))
+
+    (when (> register-count (length registers))
+      (adjust-array registers register-count))
+    
+    (let ((pc (length code))
+	  (end-pc (length operations)))
+      (do-while (< pc end-pc) 
+	(vector-push-extend (compile-operation (aref operations pc) vm pc) code)
+	(incf pc)))
+
     (let ((pc start-pc))
       (tagbody
        next
-	 (setf pc (funcall (aref code pc) stack registers))
 	 (unless (= pc stop-pc)
+	   (setf pc (funcall (aref code pc) stack registers))
 	   (go next))))))
 
 (defun push-call (vm target sloc return-pc)
@@ -65,3 +83,12 @@
 	(with-slots (r-arguments) target
 	  (replace registers argument-registers :start1 r-arguments)))
       c)))
+
+(defun vm-tests ()
+  (let ((vm (new-vm))
+	(s (new-stack))
+	(v (new-cell t-int 1)))
+    (emit vm o-push :value v)
+    (evaluate vm 0 -1 s)
+    (assert (cell= v (pop-cell s)))))
+    

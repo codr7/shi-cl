@@ -7,12 +7,13 @@
   :licence "MPL"
   :depends-on ()
   :serial t
-  :components ((:file "src/deque")
+  :components ((:file "src/util")
+	       (:file "src/deque")
 	       (:file "src/shi")
 	       (:file "src/sloc")
 	       (:file "src/cell")
 	       (:file "src/method")
-	       (:file "src/libraries/core")
+	       (:file "src/core")
 	       (:file "src/stack")
 	       (:file "src/vm")
 	       (:file "src/operation")

@@ -37,15 +37,15 @@
 
 (defun stack-tests ()
   (let* ((s (new-stack))
-	 (c1 (new-cell shi-core:t-int 1))
-	 (c2 (new-cell shi-core:t-int 2)))
-    (push-cell s c1)
-    (push-cell s c2)
+	 (v1 (new-cell t-int 1))
+	 (v2 (new-cell t-int 2)))
+    (push-cell s v1)
+    (push-cell s v2)
     (assert (= 2 (stack-length s)))
-    (assert (cell= c2 (peek-cell s)))
-    (assert (cell= c2 (pop-cell s)))
-    (assert (cell= c1 (peek-cell s)))
-    (assert (cell= c1 (pop-cell s)))
+    (assert (cell= v2 (peek-cell s)))
+    (assert (cell= v2 (pop-cell s)))
+    (assert (cell= v1 (peek-cell s)))
+    (assert (cell= v1 (pop-cell s)))
     (assert (null (peek-cell s)))))
 
     

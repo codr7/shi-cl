@@ -21,9 +21,6 @@
 (defmethod cell-type-true? ((ct cell-type) c)
   t)
 
-(defmethod cell-type-clone ((ct cell-type) c)
-  c)
-
 (defmethod cell-type-dump ((ct cell-type) c out)
   (print-object (cell-value c) out))
 
@@ -50,10 +47,6 @@
 (defun cell-true? (c)
   (with-slots (type) c
     (cell-type-true? type c)))
-
-(defun cell-clone (c)
-  (with-slots (type) c
-    (cell-type-clone type c)))
 
 (defun cell-dump (c out)
   (with-slots (type) c

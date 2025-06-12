@@ -2,4 +2,5 @@
 
 (defun tests ()
   (shi-deque:tests)
-  (stack-tests))
+  (stack-tests)
+  (vm-tests))
