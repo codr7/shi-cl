@@ -18,6 +18,10 @@
 
 (defclass vm ()
   ((call-stack :initform nil :accessor call-stack)
+   (code :initform (make-array 0 :element-type 'function
+				 :adjustable t
+				 :fill-pointer 0)
+	 :accessor code)
    (operations :initform (make-array 0 :element-type 'operation
 				       :adjustable t
 				       :fill-pointer 0)
@@ -27,6 +31,19 @@
 				      :adjustable t
 				      :fill-pointer 0)
 	      :accessor registers)))
+
+(defmacro emit (vm op &rest args)
+  `(with-slots (operations) ,vm
+     (vector-push-extend operations (make-instance ',op ,@args))))
+
+(defun evaluate (vm start-pc stop-pc stack)
+  (with-slots (code operations registers) vm
+    (let ((pc start-pc))
+      (tagbody
+       next
+	 (setf pc (funcall (aref code pc) stack registers))
+	 (unless (= pc stop-pc)
+	   (go next))))))
 
 (defun push-call (vm target sloc return-pc)
   (with-slots (call-stack registers) vm
