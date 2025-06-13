@@ -1,3 +1,7 @@
+* add library class
+** add core subclass
+** add vm user/current-library
+
 * add repl
 ** add readers
 *** add forms
