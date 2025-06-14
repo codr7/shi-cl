@@ -21,18 +21,18 @@
       (let* ((sl (stack-length stack))
 	     (as (arguments target))
 	     (al (length as))
-	     (i (- sl al 1)))
+	     (i (- sl al)))
 	(when (< i 0)
 	  (error "Error in ~a: Not enough arguments" sloc))
 
 	(dolist (a as)
 	  (let ((v (stack-get stack i))
-		(at (rest a)))
+		(at (argument-type a)))
 	    (unless (cell-isa? v at)
 	      (error "Type mismatch in ~a: expected ~a, actual ~a"
 		     sloc at v)))))
 	
-      (call target sloc vm (+ pc 1) stack registers))))
+      (call target vm (+ pc 1) stack registers sloc))))
 
 (defclass o-check (operation)
   ((expected :initform (error "Missing :expected") :initarg :expected)

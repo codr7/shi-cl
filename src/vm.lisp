@@ -84,11 +84,29 @@
 	  (replace registers argument-registers :start1 r-arguments)))
       c)))
 
-(defun vm-tests ()
+(defun call-tests ()
+  (let* ((vm (new-vm))
+	 (s (new-stack))
+	 (v (new-cell t-int 1))
+	 (m (new-lisp-method :foo
+			     `(x ,t-int)
+			     (lambda (vm pc stack registers sloc)
+			       (declare (ignore vm pc registers sloc))
+			       (let ((v (peek-cell stack)))
+				 (incf (cell-value v)))))))
+    (push-cell s v)
+    (emit vm o-call :target m :sloc (new-sloc "call-tests"))
+    (evaluate vm 0 -1 s)
+    (assert (cell= (new-cell t-int 2) (pop-cell s)))))
+
+(defun push-tests ()
   (let ((vm (new-vm))
 	(s (new-stack))
 	(v (new-cell t-int 1)))
     (emit vm o-push :value v)
     (evaluate vm 0 -1 s)
     (assert (cell= v (pop-cell s)))))
-    
+
+(defun vm-tests ()
+  (call-tests)
+  (push-tests))

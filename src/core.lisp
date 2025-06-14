@@ -9,5 +9,8 @@
 
 (defparameter t-int (new-cell-type :|Int| t-any))
 
+(defmethod cell-type= ((ct (eql t-int)) x y)
+  (= (cell-value x) (cell-value y)))
+
 (defmethod cell-type-true? ((ct (eql t-int)) c)
   (not (zerop (cell-value c))))

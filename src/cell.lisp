@@ -12,7 +12,7 @@
 					     parents)))
 
 (defmethod cell-type= ((ct cell-type) x y)
-  (eq x y))
+  (eq (cell-value x) (cell-value y)))
 
 (defun cell-type-parent? (pt st)
   (with-slots (parents) st
@@ -26,7 +26,7 @@
 
 (defmethod print-object ((ct cell-type) out)
   (with-slots (name) ct
-    (format out name)))
+    (princ (symbol-name name) out)))
 
 (defstruct (cell)
   (type (error "Missing :type") :type cell-type)
@@ -42,7 +42,7 @@
 
 (defun cell-isa? (c pt)
   (with-slots (type) c
-    (cell-type-parent? pt type)))
+    (or (eq type pt) (cell-type-parent? pt type))))
 
 (defun cell-true? (c)
   (with-slots (type) c
