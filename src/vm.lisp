@@ -24,6 +24,7 @@
 				 :adjustable t
 				 :fill-pointer 0)
 	 :accessor code)
+   (core-library :accessor core-library)
    (operations :initform (make-array 0 :element-type 'operation
 				       :adjustable t
 				       :fill-pointer 0)
@@ -34,6 +35,10 @@
 				      :adjustable t
 				      :fill-pointer 0)
 	      :accessor registers)))
+
+(defmethod initialize-instance :after ((vm vm) &key)
+  (with-slots (core-library) vm
+    (setf core-library (make-instance 'core-library :vm vm))))
 
 (defun new-vm ()
   (make-instance 'vm))

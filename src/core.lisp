@@ -1,5 +1,11 @@
 (in-package shi)
 
+(defclass core-library (library)
+  ())
+
+(defmethod initialize-instance :after ((lib core-library) &key)
+  )
+
 (defparameter t-any (new-cell-type :|Any|))
 
 (defparameter t-bool (new-cell-type :|Bool| t-any))

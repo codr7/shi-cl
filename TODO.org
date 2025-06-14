@@ -1,8 +1,7 @@
-* add library class
-** add core subclass
+* add core library
+** init types/t/f/methods
 ** add vm user/current-library
-** add bind-method
-*** use map-pairs for arguments
+** commit
 * add repl
 ** add input type
 *** deque/sloc

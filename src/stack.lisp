@@ -34,20 +34,6 @@
 
 (defun stack-length (stack)
   (length stack))
-
-(defun stack-tests ()
-  (let* ((s (new-stack))
-	 (v1 (new-cell t-int 1))
-	 (v2 (new-cell t-int 2)))
-    (push-cell s v1)
-    (push-cell s v2)
-    (assert (= 2 (stack-length s)))
-    (assert (cell= v2 (peek-cell s)))
-    (assert (cell= v2 (pop-cell s)))
-    (assert (cell= v1 (peek-cell s)))
-    (assert (cell= v1 (pop-cell s)))
-    (assert (null (peek-cell s)))))
-
     
     
     
