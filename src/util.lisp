@@ -1,6 +1,6 @@
 (defpackage shi-util
   (:use cl)
-  (:export do-while map-pairs))
+  (:export do-while kw map-pairs))
 
 (in-package shi-util)
 
@@ -12,6 +12,12 @@
 	  (when ,cnd
 	    ,@body
 	    (go ,$next))))))
+
+(defun kw (&rest args)
+  (intern (with-output-to-string (out)
+	    (dolist (a args)
+	      (princ a out)))
+	  :keyword))
 
 (defun map-pairs (fn in)
   (labels ((rec (in out)

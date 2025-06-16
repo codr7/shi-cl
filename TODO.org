@@ -1,7 +1,5 @@
 * add core library
-** init types/t/f/methods
 ** add vm user/current-library
-** commit
 * add repl
 ** add input type
 *** deque/sloc

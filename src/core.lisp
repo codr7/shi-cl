@@ -3,9 +3,6 @@
 (defclass core-library (library)
   ())
 
-(defmethod initialize-instance :after ((lib core-library) &key)
-  )
-
 (defparameter t-any (new-cell-type :|Any|))
 
 (defparameter t-bool (new-cell-type :|Bool| t-any))
@@ -20,3 +17,20 @@
 
 (defmethod cell-type-true? ((ct (eql t-int)) c)
   (not (zerop (cell-value c))))
+
+(defparameter t-meta (new-cell-type :|Meta| t-any))
+
+(defparameter t-method (new-cell-type :|Method| t-any))
+
+(defmethod initialize-instance :after ((lib core-library) &key)
+  (bind-type lib t-any)
+  (bind-type lib t-bool)
+  (bind-type lib t-int)
+  (bind-type lib t-meta)
+  (bind-type lib t-method)
+
+  (bind lib "T" t-bool t)
+  (bind lib "F" t-bool nil)
+
+  (bind-method lib + (x Int y Int)
+    (+ x y)))
