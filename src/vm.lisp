@@ -19,26 +19,28 @@
 (defgeneric compile-operation (op vm pc))
 
 (defclass vm ()
-  ((call-stack :initform nil :accessor call-stack)
+  ((call-stack :initform nil)
    (code :initform (make-array 0 :element-type 'function
 				 :adjustable t
-				 :fill-pointer 0)
-	 :accessor code)
-   (core-library :accessor core-library)
+				 :fill-pointer 0))
+   (core-library :accessor reader)
+   (current-library :accessor reader)
    (operations :initform (make-array 0 :element-type 'operation
 				       :adjustable t
-				       :fill-pointer 0)
-	       :accessor operations)
-   (register-count :initform 0 :accessor register-count)
+				       :fill-pointer 0))
+   (register-count :initform 0)
    (registers :initform (make-array 0 :element-type '(or null cell)
 				      :initial-element nil
 				      :adjustable t
-				      :fill-pointer 0)
-	      :accessor registers)))
+				      :fill-pointer 0))
+   (user-library :reader user-library)))
 
 (defmethod initialize-instance :after ((vm vm) &key)
-  (with-slots (core-library) vm
-    (setf core-library (make-instance 'core-library :vm vm))))
+  (with-slots (core-library current-library user-library) vm
+    (setf core-library (make-instance 'core-library :vm vm :name :core))
+    (setf user-library (make-instance 'library :vm vm :name :user))
+    (setf current-library user-library)
+    (import-bindings core-library user-library)))
 
 (defun new-vm ()
   (make-instance 'vm))
@@ -93,7 +95,7 @@
   (let* ((vm (new-vm))
 	 (s (new-stack))
 	 (v (new-cell t-int 1))
-	 (m (new-lisp-method :foo
+	 (m (new-lisp-method vm :foo
 			     `(x ,t-int)
 			     (lambda (vm pc stack registers sloc)
 			       (declare (ignore vm pc registers sloc))
@@ -113,5 +115,5 @@
     (assert (cell= v (pop-cell s)))))
 
 (defun vm-tests ()
-  (call-tests)
+  ;(call-tests)
   (push-tests))

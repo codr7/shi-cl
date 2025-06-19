@@ -1,8 +1,18 @@
 (defpackage shi-util
   (:use cl)
-  (:export do-while kw map-pairs))
+  (:export do-hash do-while kw map-pairs))
 
 (in-package shi-util)
+
+(defmacro do-hash ((k v tbl) &body body)
+  (let (($i (gensym)) ($k (gensym)) ($next (gensym)) ($ok (gensym)))
+    `(with-hash-table-iterator (,$i ,tbl)
+       (tagbody
+	  ,$next
+	  (multiple-value-bind (,$ok ,k ,v) (,$i)
+	    (when ,$ok
+	      ,@body
+	      (go ,$next)))))))
 
 (defmacro do-while (cnd &body body)
   (let (($next (gensym)))

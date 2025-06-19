@@ -1,5 +1,3 @@
-* add core library
-** add vm user/current-library
 * add repl
 ** add input type
 *** deque/sloc

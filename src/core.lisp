@@ -22,6 +22,9 @@
 
 (defparameter t-method (new-cell-type :|Method| t-any))
 
+(defun bind-type (lib type)
+  (bind lib (name type) t-meta type))
+
 (defmethod initialize-instance :after ((lib core-library) &key)
   (bind-type lib t-any)
   (bind-type lib t-bool)
@@ -30,7 +33,8 @@
   (bind-type lib t-method)
 
   (bind lib "T" t-bool t)
-  (bind lib "F" t-bool nil)
+  (bind lib "F" t-bool nil))
 
+(defmethod init ((lib core-library) &key)
   (bind-method lib + (x Int y Int)
     (+ x y)))
