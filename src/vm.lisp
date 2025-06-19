@@ -84,7 +84,7 @@
 
 (defun pop-call (vm)
   (with-slots (call-stack registers) vm
-    (let ((c (call-stack vm)))
+    (let ((c call-stack))
       (setf call-stack (call-parent c))
       (with-slots (argument-registers target) c
 	(with-slots (r-arguments) target

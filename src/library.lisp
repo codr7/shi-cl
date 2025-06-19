@@ -29,8 +29,8 @@
 						  :type (find-binding ,$lib
 								      (kw type))))
 			  ',arguments)))
-       (bind ,$lib ,$name t-method
-	     (new-lisp-method (vm ,$lib) ,$name ,$arguments
+       (bind ,$lib (kw ,$name) t-method
+	     (new-lisp-method (vm ,$lib) (kw ,$name) ,$arguments
 			      (lambda (pc stack registers sloc)
 				(declare (ignorable pc registers sloc))
 				,@(reverse (map-pairs (lambda (name type)
