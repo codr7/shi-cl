@@ -1,5 +1,15 @@
 (in-package shi)
 
+(defun deque-tests ()
+  (let ((q (new-deque 1 2)))
+    (assert (= (deque-length q) 2))
+    (push-back q 3)
+    (assert (= (deque-length q) 3))
+    (assert (= (pop-back q) 3))
+    (dotimes (i 2)
+      (assert (= (pop-front q) (1+ i))))
+    (assert (zerop (deque-length q)))))
+
 (defun stack-tests ()
   (let* ((s (new-stack))
 	 (v1 (new-cell t-int 1))
@@ -14,6 +24,6 @@
     (assert (null (peek-cell s)))))
 
 (defun tests ()
-  (shi-deque:tests)
+  (deque-tests)
   (stack-tests)
   (vm-tests))

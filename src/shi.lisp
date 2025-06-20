@@ -1,5 +1,5 @@
 (defpackage shi
-  (:use cl shi-util)
+  (:use cl shi-deque shi-util)
   (:import-from sb-ext save-lisp-and-die)
   (:export cell-isa?
 	   cell-type-parent?

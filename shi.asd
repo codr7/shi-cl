@@ -18,4 +18,6 @@
 	       (:file "src/core")
 	       (:file "src/vm")
 	       (:file "src/operation")
+	       (:file "src/form")
+	       (:file "src/main")
 	       (:file "src/test")))

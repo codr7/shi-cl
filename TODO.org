@@ -1,31 +1,10 @@
-* add repl
+* finish repl
 ** add input type
-*** deque/sloc
-** add readers
-*** add forms
+**** deque/sloc
+** implement read-forms
+*** add readers
+*** commit repl
 * fib
 * add benchmark op
 * convert to return total closure from evaluate
 
-(defun repl (&key (in *standard-input*) (out *standard-output*))
-  (flet ((say (spec &rest args)
-           (apply #'format out spec args)
-           (finish-output out)))
-    (let ((buffer (make-string-output-stream)))
-      (tagbody
-       next 
-         (say "  ")
-         (let ((line (read-line in nil)))
-           (when line
-             (if (string= line "")
-                 (progn
-                   (setf line (get-output-stream-string buffer))
-                   (restart-case
-                       (let* ((forms (read-forms (make-string-input-stream line)
-						 (new-location "repl")))
-                              (result (funcall (compile-lisp (emit-forms forms)))))
-			 (say "~a~%" (if result result #\_)))
-                     (ignore ()
-                       :report "Ignore condition.")))
-                 (write-string line buffer))
-             (go next)))))))

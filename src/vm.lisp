@@ -23,8 +23,8 @@
    (code :initform (make-array 0 :element-type 'function
 				 :adjustable t
 				 :fill-pointer 0))
-   (core-library :accessor reader)
-   (current-library :accessor reader)
+   (core-library :reader core-library)
+   (current-library :reader current-library)
    (operations :initform (make-array 0 :element-type 'operation
 				       :adjustable t
 				       :fill-pointer 0))
@@ -48,6 +48,10 @@
 (defmacro emit (vm op &rest args)
   `(with-slots (operations) ,vm
      (vector-push-extend (make-instance ',op ,@args) operations)))
+
+(defun emit-pc (vm)
+  (with-slots (operations) vm
+    (length operations)))
 
 (defun evaluate (vm start-pc stop-pc stack)
   (with-slots (code operations register-count registers) vm

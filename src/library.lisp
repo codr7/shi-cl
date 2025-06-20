@@ -12,11 +12,14 @@
   (with-slots (bindings) lib
     (setf (gethash name bindings) (new-cell type value))))
 
+(defun bind-cell (lib name value)
+  (bind lib name (cell-type value) value))
+
 (defmacro do-bindings ((k v lib) &body body)
   `(with-slots (bindings) ,lib
      (do-hash (,k ,v bindings)
        ,@body)))
-     
+
 (defmacro bind-method (lib name (&rest arguments) &body body)
   (let (($lib (gensym))
 	($name (gensym))
@@ -25,21 +28,22 @@
 	    (,$name (kw ',name))
 	    (,$arguments (map-pairs
 			  (lambda (name type)
-			    (make-method-argument :name (kw name)
-						  :type (find-binding ,$lib
-								      (kw type))))
+			    (make-method-argument
+			     :name (kw name)
+			     :type (cell-value (find-binding
+						,$lib
+						(kw (title-case
+						     (symbol-name type)))))))
 			  ',arguments)))
        (bind ,$lib (kw ,$name) t-method
 	     (new-lisp-method (vm ,$lib) (kw ,$name) ,$arguments
 			      (lambda (pc stack registers sloc)
 				(declare (ignorable pc registers sloc))
-				,@(reverse (map-pairs (lambda (name type)
-							(declare (ignore type))
-							`(bind ,$lib
-							       (kw ,name)
-							       (pop-cell stack)))
-						      arguments))
-				,@body))))))
+				(let (,@(reverse (map-pairs (lambda (name type)
+							      (declare (ignore type))
+							      `(,name (cell-value (pop-cell stack))))
+						      arguments)))
+				,@body)))))))
 
 (defun find-binding (lib name)
   (with-slots (bindings parent) lib

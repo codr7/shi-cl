@@ -1,6 +1,6 @@
 (defpackage shi-deque
   (:use cl)
-  (:export deque-length new-deque pop-back pop-front push-back push-front tests))
+  (:export deque-length new-deque pop-back pop-front push-back push-front))
 
 (in-package shi-deque)
 
@@ -131,14 +131,3 @@
 		    ,$prev ,$next)
 	      ,@body
 	      (go rec)))))))
-
-(defun tests ()
-  (let ((q (new-deque 1 2)))
-    (assert (= (deque-length q) 2))
-    (push-back q 3)
-    (assert (= (deque-length q) 3))
-    (assert (= (pop-back q) 3))
-    (dotimes (i 2)
-      (assert (= (pop-front q) (1+ i))))
-    (assert (zerop (deque-length q)))))
-

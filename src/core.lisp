@@ -33,8 +33,7 @@
   (bind-type lib t-method)
 
   (bind lib "T" t-bool t)
-  (bind lib "F" t-bool nil))
+  (bind lib "F" t-bool nil)
 
-(defmethod init ((lib core-library) &key)
   (bind-method lib + (x Int y Int)
     (+ x y)))

@@ -24,7 +24,8 @@
 	 :accessor body)))
 
 (defun new-lisp-method (vm name arguments body)
-  (make-instance 'lisp-method :name name
+  (make-instance 'lisp-method :vm vm
+			      :name name
 			      :arguments arguments
 			      :body body))
 

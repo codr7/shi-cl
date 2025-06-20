@@ -34,6 +34,14 @@
 
 (defun stack-length (stack)
   (length stack))
-    
+
+(defun stack-dump (s out)
+  (princ #\[ out)
+  (dotimes (i (length s))
+    (unless (zerop i)
+      (princ #\space out))
+    (print-object (aref s i) out))
+  (princ #\] out))
+
     
     

@@ -1,11 +1,11 @@
 (defpackage shi-util
   (:use cl)
-  (:export do-hash do-while kw map-pairs))
+  (:export do-hash do-while kw map-pairs title-case))
 
 (in-package shi-util)
 
 (defmacro do-hash ((k v tbl) &body body)
-  (let (($i (gensym)) ($k (gensym)) ($next (gensym)) ($ok (gensym)))
+  (let (($i (gensym)) ($next (gensym)) ($ok (gensym)))
     `(with-hash-table-iterator (,$i ,tbl)
        (tagbody
 	  ,$next
@@ -37,3 +37,6 @@
 		   (rec in (cons (funcall fn k v) out)))
 		 (nreverse out))))
     (rec in nil)))
+
+(defun title-case (s)
+  (string-downcase (string-upcase s :start 0 :end 1) :start 1))
