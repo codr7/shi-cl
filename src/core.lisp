@@ -36,4 +36,4 @@
   (bind lib "F" t-bool nil)
 
   (bind-method lib + (x Int y Int)
-    (+ x y)))
+    (push-new-cell stack t-int (+ x y))))

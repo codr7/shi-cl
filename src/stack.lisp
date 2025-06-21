@@ -15,6 +15,9 @@
 (defun push-cell (stack cell)
   (vector-push-extend cell stack))
 
+(defun push-new-cell (stack type value)
+  (push-cell stack (new-cell type value)))
+
 (declaim (ftype (function (stack) (or null cell)) peek-cell))
 
 (defun peek-cell (stack)
