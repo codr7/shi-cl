@@ -1,4 +1,7 @@
 * finish repl
+** add *vm*
+** add *registers*
+*** replace call arg
 ** add input type
 **** deque/sloc
 ** implement read-forms

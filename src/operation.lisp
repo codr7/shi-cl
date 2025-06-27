@@ -4,10 +4,10 @@
   ((end :initform (error "Missing :end") :initarg :end)))
 
 (defmethod compile-operation ((op o-branch) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (declare (ignore registers))
     (with-slots (end) op
-      (if (cell-true? (pop-cell stack))
+      (if (cell-true? (pop-cell))
 	  (+ pc 1)
 	  (pc end)))))
 
@@ -16,33 +16,34 @@
    (target :initform (error "Missing :target") :initarg :target)))
 
 (defmethod compile-operation ((op o-call) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (with-slots (sloc target) op
-      (let* ((sl (stack-length stack))
+      (let* ((sl (stack-length))
 	     (as (arguments target))
 	     (al (length as))
 	     (i (- sl al)))
 	(when (< i 0)
-	  (error "Error in ~a: Not enough arguments" sloc))
+	  (error "Error in ~a: Not enough arguments ~a ~a" sloc as *stack*))
 
 	(dolist (a as)
-	  (let ((v (stack-get stack i))
+	  (let ((v (stack-get i))
 		(at (argument-type a)))
 	    (unless (cell-isa? v at)
 	      (error "Type mismatch in ~a: expected ~a, actual ~a"
-		     sloc at v)))))
+		     sloc at v)))
+	  (incf i)))
 	
-      (call target vm (+ pc 1) stack registers sloc))))
+      (call target (+ pc 1) registers sloc))))
 
 (defclass o-check (operation)
   ((expected :initform (error "Missing :expected") :initarg :expected)
    (sloc :initform (error "Missing :sloc") :initarg :sloc)))
 
 (defmethod compile-operation ((op o-check) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (declare (ignore registers))
     (with-slots (expected sloc) op
-      (let ((actual (pop-cell stack)))
+      (let ((actual (pop-cell)))
 	(unless (cell= expected actual)
 	  (error "Check failed in ~a; expected ~a, actual ~a"
 		 sloc expected actual))))
@@ -52,17 +53,17 @@
   ((r-source :initform (error "Missing :r-source") :initarg :r-source)))
 
 (defmethod compile-operation ((op o-get) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (with-slots (r-source) op
-      (push-cell stack (aref registers r-source)))
+      (push-cell (aref registers r-source)))
     (+ pc 1)))
 
 (defclass o-goto (operation)
   ((pc :initform (error "Missing :pc") :initarg :pc)))
 
 (defmethod compile-operation ((op o-goto) vm pc)
-  (lambda (stack registers)
-    (declare (ignore registers stack))
+  (lambda (registers)
+    (declare (ignore registers))
     (with-slots (pc) op
       pc)))
 
@@ -70,25 +71,25 @@
   ((value :initform (error "Missing :value") :initarg :value :accessor value)))
 
 (defmethod compile-operation ((op o-push) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (declare (ignore registers))
     (with-slots (value) op
-      (push-cell stack value))
+      (push-cell value))
     (+ pc 1)))
 
 (defclass o-put (operation)
   ((r-target :initform (error "Missing :r-target") :initarg :r-target)))
 
 (defmethod compile-operation ((op o-put) vm pc)
-  (lambda (stack registers)
+  (lambda (registers)
     (with-slots (r-target) op
-      (setf (aref registers r-target) (pop-cell stack)))
+      (setf (aref registers r-target) (pop-cell)))
     (+ pc 1)))
 
 (defclass o-return (operation)
   ())
 
 (defmethod compile-operation ((op o-return) vm pc)
-  (lambda (stack registers)
-    (declare (ignore registers stack))
+  (lambda (registers)
+    (declare (ignore registers))
       (call-return-pc (pop-call vm))))

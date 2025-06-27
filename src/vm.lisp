@@ -53,7 +53,7 @@
   (with-slots (operations) vm
     (length operations)))
 
-(defun evaluate (vm start-pc stop-pc stack)
+(defun evaluate (vm start-pc stop-pc)
   (with-slots (code operations register-count registers) vm
     (when (= stop-pc -1)
       (setf stop-pc (length operations)))
@@ -71,7 +71,7 @@
       (tagbody
        next
 	 (unless (= pc stop-pc)
-	   (setf pc (funcall (aref code pc) stack registers))
+	   (setf pc (funcall (aref code pc) registers))
 	   (go next))))))
 
 (defun push-call (vm target sloc return-pc)
@@ -97,27 +97,27 @@
 
 (defun call-tests ()
   (let* ((vm (new-vm))
-	 (s (new-stack))
+	 (*stack* (new-stack))
 	 (v (new-cell t-int 1))
 	 (m (new-lisp-method vm :foo
-			     `(x ,t-int)
-			     (lambda (vm pc stack registers sloc)
-			       (declare (ignore vm pc registers sloc))
-			       (let ((v (peek-cell stack)))
+			     (parse-method-arguments `(x ,t-int))
+			     (lambda (pc registers sloc)
+			       (declare (ignore pc registers sloc))
+			       (let ((v (peek-cell)))
 				 (incf (cell-value v)))))))
-    (push-cell s v)
+    (push-cell v)
     (emit vm o-call :target m :sloc (new-sloc "call-tests"))
-    (evaluate vm 0 -1 s)
-    (assert (cell= (new-cell t-int 2) (pop-cell s)))))
+    (evaluate vm 0 -1)
+    (assert (cell= (new-cell t-int 2) (pop-cell)))))
 
 (defun push-tests ()
   (let ((vm (new-vm))
-	(s (new-stack))
+	(*stack* (new-stack))
 	(v (new-cell t-int 1)))
     (emit vm o-push :value v)
-    (evaluate vm 0 -1 s)
-    (assert (cell= v (pop-cell s)))))
+    (evaluate vm 0 -1)
+    (assert (cell= v (pop-cell)))))
 
 (defun vm-tests ()
-  ;(call-tests)
+  (call-tests)
   (push-tests))
