@@ -1,6 +1,9 @@
 * finish repl
-** add *vm*
 ** add *registers*
+*** recreate with fixed size in (evaluate)
+**** add new-registers
+** add (register (i))/setf
+*** grep registers & replace
 *** replace call arg
 ** add input type
 **** deque/sloc

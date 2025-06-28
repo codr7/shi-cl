@@ -3,7 +3,7 @@
 (defclass o-branch (operation)
   ((end :initform (error "Missing :end") :initarg :end)))
 
-(defmethod compile-operation ((op o-branch) vm pc)
+(defmethod compile-operation ((op o-branch) pc)
   (lambda (registers)
     (declare (ignore registers))
     (with-slots (end) op
@@ -15,7 +15,7 @@
   ((sloc :initform (error "Missing :sloc") :initarg :sloc)
    (target :initform (error "Missing :target") :initarg :target)))
 
-(defmethod compile-operation ((op o-call) vm pc)
+(defmethod compile-operation ((op o-call) pc)
   (lambda (registers)
     (with-slots (sloc target) op
       (let* ((sl (stack-length))
@@ -39,7 +39,7 @@
   ((expected :initform (error "Missing :expected") :initarg :expected)
    (sloc :initform (error "Missing :sloc") :initarg :sloc)))
 
-(defmethod compile-operation ((op o-check) vm pc)
+(defmethod compile-operation ((op o-check) pc)
   (lambda (registers)
     (declare (ignore registers))
     (with-slots (expected sloc) op
@@ -52,7 +52,7 @@
 (defclass o-get (operation)
   ((r-source :initform (error "Missing :r-source") :initarg :r-source)))
 
-(defmethod compile-operation ((op o-get) vm pc)
+(defmethod compile-operation ((op o-get) pc)
   (lambda (registers)
     (with-slots (r-source) op
       (push-cell (aref registers r-source)))
@@ -61,7 +61,7 @@
 (defclass o-goto (operation)
   ((pc :initform (error "Missing :pc") :initarg :pc)))
 
-(defmethod compile-operation ((op o-goto) vm pc)
+(defmethod compile-operation ((op o-goto) pc)
   (lambda (registers)
     (declare (ignore registers))
     (with-slots (pc) op
@@ -70,7 +70,7 @@
 (defclass o-push (operation)
   ((value :initform (error "Missing :value") :initarg :value :accessor value)))
 
-(defmethod compile-operation ((op o-push) vm pc)
+(defmethod compile-operation ((op o-push) pc)
   (lambda (registers)
     (declare (ignore registers))
     (with-slots (value) op
@@ -80,7 +80,7 @@
 (defclass o-put (operation)
   ((r-target :initform (error "Missing :r-target") :initarg :r-target)))
 
-(defmethod compile-operation ((op o-put) vm pc)
+(defmethod compile-operation ((op o-put) pc)
   (lambda (registers)
     (with-slots (r-target) op
       (setf (aref registers r-target) (pop-cell)))
@@ -89,7 +89,7 @@
 (defclass o-return (operation)
   ())
 
-(defmethod compile-operation ((op o-return) vm pc)
+(defmethod compile-operation ((op o-return) pc)
   (lambda (registers)
     (declare (ignore registers))
-      (call-return-pc (pop-call vm))))
+      (call-return-pc (pop-call))))

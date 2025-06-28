@@ -16,8 +16,6 @@
 (defclass operation ()
   ())
 
-(defgeneric compile-operation (op vm pc))
-
 (defclass vm ()
   ((call-stack :initform nil)
    (code :initform (make-array 0 :element-type 'function
@@ -35,6 +33,10 @@
 				      :fill-pointer 0))
    (user-library :reader user-library)))
 
+(defvar *vm*)
+
+(defgeneric compile-operation (op pc))
+
 (defmethod initialize-instance :after ((vm vm) &key)
   (with-slots (core-library current-library user-library) vm
     (setf core-library (make-instance 'core-library :vm vm :name :core))
@@ -45,16 +47,16 @@
 (defun new-vm ()
   (make-instance 'vm))
 
-(defmacro emit (vm op &rest args)
-  `(with-slots (operations) ,vm
+(defmacro emit (op &rest args)
+  `(with-slots (operations) *vm*
      (vector-push-extend (make-instance ',op ,@args) operations)))
 
-(defun emit-pc (vm)
-  (with-slots (operations) vm
+(defun emit-pc ()
+  (with-slots (operations) *vm*
     (length operations)))
 
-(defun evaluate (vm start-pc stop-pc)
-  (with-slots (code operations register-count registers) vm
+(defun evaluate (start-pc stop-pc)
+  (with-slots (code operations register-count registers) *vm*
     (when (= stop-pc -1)
       (setf stop-pc (length operations)))
 
@@ -64,7 +66,7 @@
     (let ((pc (length code))
 	  (end-pc (length operations)))
       (do-while (< pc end-pc) 
-	(vector-push-extend (compile-operation (aref operations pc) vm pc) code)
+	(vector-push-extend (compile-operation (aref operations pc) pc) code)
 	(incf pc)))
 
     (let ((pc start-pc))
@@ -74,8 +76,8 @@
 	   (setf pc (funcall (aref code pc) registers))
 	   (go next))))))
 
-(defun push-call (vm target sloc return-pc)
-  (with-slots (call-stack registers) vm
+(defun push-call (target sloc return-pc)
+  (with-slots (call-stack registers) *vm*
     (let ((argument-registers (subseq registers
 				      (r-arguments target)
 				      (+ (r-arguments target)
@@ -86,8 +88,8 @@
 				  :sloc sloc
 				  :return-pc return-pc)))))
 
-(defun pop-call (vm)
-  (with-slots (call-stack registers) vm
+(defun pop-call ()
+  (with-slots (call-stack registers) *vm*
     (let ((c call-stack))
       (setf call-stack (call-parent c))
       (with-slots (argument-registers target) c
@@ -96,26 +98,26 @@
       c)))
 
 (defun call-tests ()
-  (let* ((vm (new-vm))
+  (let* ((*vm* (new-vm))
 	 (*stack* (new-stack))
 	 (v (new-cell t-int 1))
-	 (m (new-lisp-method vm :foo
+	 (m (new-lisp-method *vm* :foo
 			     (parse-method-arguments `(x ,t-int))
 			     (lambda (pc registers sloc)
 			       (declare (ignore pc registers sloc))
 			       (let ((v (peek-cell)))
 				 (incf (cell-value v)))))))
     (push-cell v)
-    (emit vm o-call :target m :sloc (new-sloc "call-tests"))
-    (evaluate vm 0 -1)
+    (emit o-call :target m :sloc (new-sloc "call-tests"))
+    (evaluate 0 -1)
     (assert (cell= (new-cell t-int 2) (pop-cell)))))
 
 (defun push-tests ()
-  (let ((vm (new-vm))
+  (let ((*vm* (new-vm))
 	(*stack* (new-stack))
 	(v (new-cell t-int 1)))
-    (emit vm o-push :value v)
-    (evaluate vm 0 -1)
+    (emit o-push :value v)
+    (evaluate 0 -1)
     (assert (cell= v (pop-cell)))))
 
 (defun vm-tests ()

@@ -24,8 +24,8 @@
 (defmethod cell-type-dump ((ct cell-type) c out)
   (print-object (cell-value c) out))
 
-(defmethod cell-type-emit (vm ct c arguments sloc)
-  (emit vm o-push :value c))
+(defmethod cell-type-emit (ct c arguments sloc)
+  (emit o-push :value c))
 
 (defmethod print-object ((ct cell-type) out)
   (with-slots (name) ct
@@ -58,7 +58,7 @@
 (defmethod print-object ((c cell) out)
   (cell-dump c out))
 
-(defun emit-cell (vm c arguments sloc)
+(defun emit-cell (c arguments sloc)
   (with-slots (type) c
-    (cell-type-emit vm type c arguments sloc)))
+    (cell-type-emit type c arguments sloc)))
   
