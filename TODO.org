@@ -1,8 +1,14 @@
-* finish repl
-** add input type
-**** deque/sloc
-** implement read-forms
-*** add readers
+* implement forms
+** tests/commit
+
+* add read-int from claesp
+
+* add input type
+** add read-in
+*** add *in* var
+**** set in read-forms
+*** remove arg
+** deque/sloc
 
 * extract vm.current-library to *library*
 
