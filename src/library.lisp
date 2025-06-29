@@ -36,9 +36,9 @@
 						     (symbol-name type)))))))
 			  ',arguments)))
        (bind ,$lib (kw ,$name) t-method
-	     (new-lisp-method (vm ,$lib) (kw ,$name) ,$arguments
-			      (lambda (pc stack registers sloc)
-				(declare (ignorable pc registers sloc))
+	     (new-lisp-method (kw ,$name) ,$arguments
+			      (lambda (pc stack sloc)
+				(declare (ignorable pc sloc))
 				(let (,@(reverse (map-pairs (lambda (name type)
 							      (declare (ignore type))
 							      `(,name (cell-value (pop-cell stack))))

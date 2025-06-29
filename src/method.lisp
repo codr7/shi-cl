@@ -13,25 +13,23 @@
   ((arguments :initform (error "Missing :arguments")
 	      :initarg :arguments
 	      :accessor arguments)
-   (name :initform (error "Missing :name") :initarg :name :accessor name)
-   (vm :initform (error "Missing :vm") :initarg :vm :accessor vm)))
+   (name :initform (error "Missing :name") :initarg :name :accessor name)))
 
-(defgeneric call (target pc registers sloc))
+(defgeneric call (target pc sloc))
 
 (defclass lisp-method (base-method)
   ((body :initform (error "Missing :body")
 	 :initarg :body
 	 :accessor body)))
 
-(defun new-lisp-method (vm name arguments body)
-  (make-instance 'lisp-method :vm vm
-			      :name name
+(defun new-lisp-method (name arguments body)
+  (make-instance 'lisp-method :name name
 			      :arguments arguments
 			      :body body))
 
-(defmethod call ((target lisp-method) pc registers sloc)
+(defmethod call ((target lisp-method) pc sloc)
   (with-slots (body) target
-    (funcall body pc registers sloc)
+    (funcall body pc sloc)
     pc))
 
 (defclass shi-method (base-method)
@@ -42,7 +40,7 @@
 	     :initarg :start-pc
 	     :accessor start-pc)))
 
-(defmethod call ((target shi-method) pc registers sloc)
-  (with-slots (start-pc vm) target
+(defmethod call ((target shi-method) pc sloc)
+  (with-slots (vm) target
     (push-call vm target pc sloc)
     start-pc))

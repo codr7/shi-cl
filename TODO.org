@@ -1,15 +1,11 @@
 * finish repl
-** add *registers*
-*** recreate with fixed size in (evaluate)
-**** add new-registers
-** add (register (i))/setf
-*** grep registers & replace
-*** replace call arg
 ** add input type
 **** deque/sloc
 ** implement read-forms
 *** add readers
-*** commit repl
+
+* extract vm.current-library to *library*
+
 * fib
 * add benchmark op
 * convert to return total closure from evaluate

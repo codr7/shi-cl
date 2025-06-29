@@ -27,11 +27,22 @@
 				       :adjustable t
 				       :fill-pointer 0))
    (register-count :initform 0)
-   (registers :initform (make-array 0 :element-type '(or null cell)
-				      :initial-element nil
-				      :adjustable t
-				      :fill-pointer 0))
    (user-library :reader user-library)))
+
+(defvar *registers* nil)
+
+(defun new-registers (n)
+  (let ((rs (make-array n :element-type '(or null cell) :initial-element nil)))
+    (when *registers*
+      (dotimes (i (length *registers*))
+	(setf (aref rs i) (aref *registers* i))))
+    rs))
+
+(defun register (i)
+  (aref *registers* i))
+
+(defun (setf register) (v i)
+  (setf (aref *registers* i) v))
 
 (defvar *vm*)
 
@@ -60,25 +71,25 @@
     (when (= stop-pc -1)
       (setf stop-pc (length operations)))
 
-    (when (> register-count (length registers))
-      (adjust-array registers register-count))
-    
-    (let ((pc (length code))
+    (let ((*registers* (if (> register-count (length *registers*))
+			   (new-registers register-count)
+			   *registers*))
+	  (pc (length code))
 	  (end-pc (length operations)))
       (do-while (< pc end-pc) 
 	(vector-push-extend (compile-operation (aref operations pc) pc) code)
-	(incf pc)))
-
-    (let ((pc start-pc))
-      (tagbody
-       next
-	 (unless (= pc stop-pc)
-	   (setf pc (funcall (aref code pc) registers))
-	   (go next))))))
+	(incf pc))
+      
+      (let ((pc start-pc))
+	(tagbody
+	 next
+	   (unless (= pc stop-pc)
+	     (setf pc (funcall (aref code pc)))
+	     (go next)))))))
 
 (defun push-call (target sloc return-pc)
-  (with-slots (call-stack registers) *vm*
-    (let ((argument-registers (subseq registers
+  (with-slots (call-stack) *vm*
+    (let ((argument-registers (subseq *registers*
 				      (r-arguments target)
 				      (+ (r-arguments target)
 					 (length (arguments target))))))
@@ -89,22 +100,22 @@
 				  :return-pc return-pc)))))
 
 (defun pop-call ()
-  (with-slots (call-stack registers) *vm*
+  (with-slots (call-stack) *vm*
     (let ((c call-stack))
       (setf call-stack (call-parent c))
       (with-slots (argument-registers target) c
 	(with-slots (r-arguments) target
-	  (replace registers argument-registers :start1 r-arguments)))
+	  (replace *registers* argument-registers :start1 r-arguments)))
       c)))
 
 (defun call-tests ()
   (let* ((*vm* (new-vm))
 	 (*stack* (new-stack))
 	 (v (new-cell t-int 1))
-	 (m (new-lisp-method *vm* :foo
+	 (m (new-lisp-method :foo
 			     (parse-method-arguments `(x ,t-int))
-			     (lambda (pc registers sloc)
-			       (declare (ignore pc registers sloc))
+			     (lambda (pc sloc)
+			       (declare (ignore pc sloc))
 			       (let ((v (peek-cell)))
 				 (incf (cell-value v)))))))
     (push-cell v)
